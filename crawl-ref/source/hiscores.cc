@@ -445,8 +445,8 @@ void UIHiscoresMenu::_allocate_region()
     const int max_col = m_region[2] - 1, max_line = m_region[3] - 1;
 #endif
 
-    const int scores_col_start = 0;
-    const int descriptor_col_start = 0;
+    const int scores_col_start = 1;
+    const int descriptor_col_start = 1;
     const int scores_row_start = 10;
     const int scores_col_end = max_col;
     const int scores_row_end = max_line+1;
