@@ -42,6 +42,7 @@ ae += [^n]identified.*spellbook
 :add_autopickup_func(function (it, name)
 :  local itsubtype = it.subtype()
 :  if you.mutation("missing a hand") == 1 and you.race() ~= "octopode"
+:  and you.god() ~= "Igni Ipthes"
 :  and it.class(true) == "jewellery"
 :  and (itsubtype == "ring of positive energy"
 :   or itsubtype == "ring of flight"
@@ -70,11 +71,33 @@ ae += [^n]identified.*spellbook
 :   return it.stacks() or nil
 : end)
 
-# Excluding amulets as you only need one of each. (If you know the subtype
-# that means you already have one of it.). Some items may already be excluded
-# as bad_item, e.g. inaccuracy.
-ae += amulet of (nothing|inaccuracy|the gourmand|regeneration|harm)
-ae += amulet of (rage|guardian spirit|faith|magic regeneration|the acrobat)
+# Excluding some jewellery as you only need one of each. 
+# (If you know the subtype that means you already have one of it.). 
+# Some items may already be exclude as bad_item, e.g. inaccuracy.
+: add_autopickup_func(function (it, name)
+:  local itsubtype = it.subtype()
+:  if it.class(true) == "jewellery"
+:  and you.god() ~= "Igni Ipthes"
+:  and (itsubtype == "amulet of inaccuracy"
+:   or itsubtype == "amulet of the gourmand"
+:   or itsubtype == "amulet of regeneration"
+:   or itsubtype == "amulet of harm"
+:   or itsubtype == "amulet of rage"
+:   or itsubtype == "amulet of guardian spirit"
+:   or itsubtype == "amulet of faith"
+:   or itsubtype == "amulet of magic regeneration"
+:   or itsubtype == "amulet of the acrobat"
+:   or itsubtype == "ring of see invisible"
+:   or itsubtype == "ring of flight"
+:   or itsubtype == "ring of poison resistance"
+:   or itsubtype == "ring of resist corrosion") then
+:    for inv in iter.invent_iterator:new(items.inventory()) do
+:      if it.class(true) == inv.class(true)
+:      and itsubtype == inv.subtype() then
+:        return false
+:      end
+:    end
+:  end
+:  return
+:end)
 
-# Likewise for some rings.
-ae += ring of (see invisible|flight|poison resistance|resist corrosion)
