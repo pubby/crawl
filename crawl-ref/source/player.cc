@@ -3037,10 +3037,6 @@ void level_change(bool skip_attribute_increase)
                     {
                         const spell_type spell = static_cast<spell_type>(s);
 
-                        // Pain brand is useless without necromancy skill.
-                        if (spell == SPELL_EXCRUCIATING_WOUNDS)
-                            continue;
-
                         if (!is_player_spell(spell) || you.has_spell(spell))
                             continue;
 
