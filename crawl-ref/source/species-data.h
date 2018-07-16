@@ -27,7 +27,7 @@ static const map<species_type, species_def> species_data =
     0, 1, 2, 3,
     MONS_ONI,
     HT_LAND, US_ALIVE, SIZE_MEDIUM,
-    9, 9, 7, // 25
+    11, 9, 6, // 26
     { STAT_STR, STAT_INT, STAT_DEX }, 4,
     { { MUT_HORNS, 1, 1 }, { MUT_CLAWS, 1, 1 }, { MUT_FANGS, 1, 1 } },
     { "You learn spells by gaining experience, not through books or religion.",
