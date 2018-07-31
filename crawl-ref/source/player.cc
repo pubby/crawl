@@ -3076,12 +3076,14 @@ void level_change(bool skip_attribute_increase)
                         you.spell_library.set(spell, true);
 
                         mprf(MSGCH_INTRINSIC_GAIN,
-                             "You have discovered the spell %s.", spell_title(spell));
+                             "You have discovered the spell %s.", 
+                             spell_title(spell));
 
                         goto finish;
                     }
 
-                    mprf(MSGCH_INTRINSIC_GAIN, "You were unable to discover any spells.");
+                    mprf(MSGCH_INTRINSIC_GAIN,
+                         "You were unable to discover any spells.");
                     break;
                 }
             }
