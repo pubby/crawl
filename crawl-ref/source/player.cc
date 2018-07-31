@@ -725,10 +725,11 @@ maybe_bool you_can_wear(equipment_type eq, bool temp)
 
     case EQ_BOOTS: // And bardings
         dummy.sub_type = ARM_BOOTS;
-        if (you.species == SP_NAGA)
-            alternate.sub_type = ARM_NAGA_BARDING;
-        if (you.species == SP_CENTAUR)
-            alternate.sub_type = ARM_CENTAUR_BARDING;
+        if (you.species == SP_NAGA
+            || you.species == SP_CENTAUR)
+        {
+            alternate.sub_type = ARM_BARDING;
+        }
         break;
 
     case EQ_BODY_ARMOUR:
@@ -2758,18 +2759,35 @@ void recalc_and_scale_hp()
 int xp_to_level_diff(int xp, int scale)
 {
     ASSERT(xp >= 0);
-    int adjusted_xp = you.experience + xp;
-    int level = you.experience_level;
-    while (adjusted_xp >= (int) exp_needed(level + 1))
-        level++;
+    const int adjusted_xp = you.experience + xp;
+    int projected_level = you.experience_level;
+    while (you.experience >= exp_needed(projected_level + 1))
+        projected_level++; // handle xl 27 chars
+    int adjusted_level = projected_level;
+
+    // closest whole number level, rounding down
+    while (adjusted_xp >= (int) exp_needed(adjusted_level + 1))
+        adjusted_level++;
     if (scale > 1)
     {
-        unsigned int remainder = adjusted_xp - (int) exp_needed(level);
-        unsigned int denom = exp_needed(level + 1) - (int) exp_needed(level);
-        return (level - you.experience_level) * scale +
-                    (remainder * scale / denom);
+        // TODO: what is up with all the casts here?
+
+        // decimal scaled version of current level including whatever fractional
+        // part scale can handle
+        const int cur_level_scaled = projected_level * scale
+                + (you.experience - (int) exp_needed(projected_level)) * scale /
+                    ((int) exp_needed(projected_level + 1)
+                                    - (int) exp_needed(projected_level));
+
+        // decimal scaled version of what adjusted_xp would get you
+        const int adjusted_level_scaled = adjusted_level * scale
+                + (adjusted_xp - (int) exp_needed(adjusted_level)) * scale /
+                    ((int) exp_needed(adjusted_level + 1)
+                                    - (int) exp_needed(adjusted_level));
+        // TODO: this would be more usable with better rounding behavior
+        return adjusted_level_scaled - cur_level_scaled;
     } else
-        return level - you.experience_level;
+        return adjusted_level - projected_level;
 }
 
 /**
@@ -3226,7 +3244,7 @@ int player_stealth()
     stealth += STEALTH_PIP * you.scan_artefacts(ARTP_STEALTH);
 
     stealth += STEALTH_PIP * you.wearing(EQ_RINGS, RING_STEALTH);
-    stealth -= STEALTH_PIP * you.wearing(EQ_RINGS, RING_LOUDNESS);
+    stealth -= STEALTH_PIP * you.wearing(EQ_RINGS, RING_ATTENTION);
 
     if (you.duration[DUR_STEALTH])
         stealth += STEALTH_PIP * 2;
@@ -3571,9 +3589,10 @@ bool player::gourmand(bool calc_unid, bool items) const
            || actor::gourmand(calc_unid, items);
 }
 
-bool player::stasis() const
+bool player::stasis(bool calc_unid, bool items) const
 {
-    return species == SP_FORMICID;
+    return species == SP_FORMICID
+           || actor::stasis(calc_unid, items);
 }
 
 bool player::cloud_immune(bool calc_unid, bool items) const
@@ -6938,7 +6957,7 @@ bool player::has_usable_hooves(bool allow_tran) const
 {
     return has_hooves(allow_tran)
            && (!slot_item(EQ_BOOTS)
-               || wearing(EQ_BOOTS, ARM_CENTAUR_BARDING, true));
+               || wearing(EQ_BOOTS, ARM_BARDING, true));
 }
 
 int player::has_fangs(bool allow_tran) const

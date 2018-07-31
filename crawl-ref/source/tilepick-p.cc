@@ -434,11 +434,20 @@ tileidx_t tilep_equ_boots(const item_def &item)
             return tile;
     }
 
+#if TAG_MAJOR_VERSION == 34
     if (item.sub_type == ARM_NAGA_BARDING)
         return TILEP_BOOTS_NAGA_BARDING + min(etype, 3);
 
     if (item.sub_type == ARM_CENTAUR_BARDING)
         return TILEP_BOOTS_CENTAUR_BARDING + min(etype, 3);
+#endif
+    if (item.sub_type == ARM_BARDING)
+    {
+        if (you.species == SP_NAGA)
+            return TILEP_BOOTS_NAGA_BARDING + min(etype, 3);
+        else
+            return TILEP_BOOTS_CENTAUR_BARDING + min(etype, 3);
+    }
 
     if (item.sub_type != ARM_BOOTS)
         return 0;
@@ -639,6 +648,8 @@ tileidx_t tilep_species_to_base_tile(int sp, int level)
         return TILEP_BASE_HALFLING;
     case SP_ONI:
         return TILEP_BASE_ONI;
+    case SP_GNOLL:
+        return TILEP_BASE_GNOLL;
     default:
         return TILEP_BASE_HUMAN;
     }
@@ -682,15 +693,6 @@ void tilep_race_default(int sp, int level, dolls_data *doll)
         case SP_DEEP_ELF:
             hair = TILEP_HAIR_ELF_WHITE;
             break;
-        case SP_HILL_ORC:
-            hair = 0;
-            break;
-        case SP_KOBOLD:
-            hair = 0;
-            break;
-        case SP_MUMMY:
-            hair = 0;
-            break;
         case SP_TROLL:
             hair = TILEP_HAIR_TROLL;
             break;
@@ -708,15 +710,6 @@ void tilep_race_default(int sp, int level, dolls_data *doll)
             hair   = 0;
             break;
         }
-        case SP_MINOTAUR:
-            hair = 0;
-            break;
-        case SP_DEMONSPAWN:
-            hair = 0;
-            break;
-        case SP_GHOUL:
-            hair = 0;
-            break;
         case SP_MERFOLK:
             result = you.fishtail ? TILEP_BASE_MERFOLK_WATER
                                   : TILEP_BASE_MERFOLK;
@@ -736,7 +729,17 @@ void tilep_race_default(int sp, int level, dolls_data *doll)
             hair = 0;
             beard = TILEP_BEARD_MEDIUM_GREEN;
             break;
+        case SP_MINOTAUR:
+        case SP_DEMONSPAWN:
+        case SP_GHOUL:
+        case SP_HILL_ORC:
+        case SP_KOBOLD:
+        case SP_MUMMY:
         case SP_FORMICID:
+        case SP_BARACHI:
+        case SP_GNOLL:
+        case SP_GARGOYLE:
+        case SP_VINE_STALKER:
             hair = 0;
             break;
         case SP_FAIRY:

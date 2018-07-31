@@ -2407,7 +2407,6 @@ int exper_value(const monster& mon, bool real)
             case SPELL_AGONY:
             case SPELL_LRD:
             case SPELL_DIG:
-            case SPELL_CHAIN_OF_CHAOS:
             case SPELL_FAKE_MARA_SUMMON:
                 diff += 10;
                 break;
@@ -4176,12 +4175,12 @@ bool mons_can_traverse(const monster& mon, const coord_def& p,
     if (only_in_sight && !you.see_cell_no_trans(p))
         return false;
 
-    if ((grd(p) == DNGN_CLOSED_DOOR
-        || grd(p) == DNGN_SEALED_DOOR)
-            && _mons_can_pass_door(&mon, p))
-    {
+    if (cell_is_runed(p))
+        return false;
+
+    // Includes sealed doors.
+    if (feat_is_closed_door(grd(p)) && _mons_can_pass_door(&mon, p))
         return true;
-    }
 
     if (!mon.is_habitable(p))
         return false;
